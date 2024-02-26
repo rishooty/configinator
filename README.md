@@ -6,10 +6,6 @@ Only tested on retroarch's own .cfg where everything is a string at the moment.
 
 Goal is to have this publicly hosted, as a PWA, and a self hosted version with its own node-express API to edit files directly on emulation handhelds or mini pcs.
 
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
 ## TODO:
 - [ ] Have it parse special comments for more validation and input types; i.e. # C[Step: 10, Max: Height]R or C[Type: SDL Input]
 - [ ] Have parse nearby comments (excepting the above) as tooltips.
