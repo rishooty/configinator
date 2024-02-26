@@ -1,6 +1,6 @@
 # configinator
 
-Less tedious config/cfg/ini/yaml configuration than just plaintext alone.
+Less tedious config/cfg/ini/yaml configuration than just plaintext editor alone.
 
 Only tested on retroarch's own .cfg where everything is a string at the moment.
 
