@@ -1,6 +1,10 @@
 # configinator
 
-This template should help get you started developing with Vue 3 in Vite.
+Less tedious config/cfg/ini/yaml configuration than just plaintext alone.
+
+Only tested on retroarch's own .cfg where everything is a string at the moment.
+
+Goal is to have this publicly hosted, as a PWA, and perhaps an electron port eventually that can edit files directly from device.
 
 ## Recommended IDE Setup
 
