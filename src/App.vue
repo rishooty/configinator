@@ -5,8 +5,21 @@
       <h2>{{ groupName }}</h2>
       <div v-for="(item, key) in group" :key="key">
         <label style="padding-right: 1vw">{{ key }}</label>
+        <div v-if="isOptType(item?.parameters?.Type)">
+          <input
+            :list="`options-list-${groupName}-${key}`"
+            :value="item.value"
+            @input="updateValue(key, groupName, $event.target.value)"
+          />
+          <datalist :id="`options-list-${groupName}-${key}`">
+            <option v-for="(option, index) in getOptions(item)" :key="index" :value="option">
+              {{ option }}
+            </option>
+          </datalist>
+        </div>
+
         <input
-          v-if="isBoolean(item.value)"
+          v-else-if="isBoolean(item.value)"
           type="checkbox"
           :checked="item.value?.toLowerCase() === 'true'"
           @change="updateBoolean(key, groupName, $event.target.checked)"
@@ -20,19 +33,6 @@
           :step="item?.parameters?.Step"
           @input="updateValue(key, groupName, $event.target.value)"
         />
-        <select
-          v-else-if="isOptType(item?.parameters?.Type)"
-          :value="item.value"
-          @input="updateValue(key, groupName, $event.target.value)"
-        >
-          <option
-            v-for="(option, index) in item?.parameters?.Opts?.split('|')"
-            :key="index"
-            :value="option"
-          >
-            {{ option }}
-          </option>
-        </select>
         <input
           v-else
           type="text"
@@ -40,18 +40,22 @@
           @input="updateValue(key, groupName, $event.target.value)"
         />
         <!-- Display parameters if they exist -->
-        <div v-if="item.parameters">
+        <!-- <div v-if="item.parameters">
           <div v-for="(paramValue, paramKey) in item.parameters" :key="paramKey">
             <label>{{ paramKey }}</label>
             <input type="text" :value="paramValue" readonly />
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
 </template>
 
 <script>
+const optionSets = {
+  Height: ['480', '576', '720', '1080', '1440', '2160', '4320']
+}
+
 export default {
   data() {
     return {
@@ -63,13 +67,27 @@ export default {
     const text = await response.text()
     this.parseConfig(text)
   },
+  computed: {
+    getOptions() {
+      return (item) => {
+        if (item?.parameters?.Opts) {
+          const optsArray = item.parameters.Opts.split('|')
+          if (optsArray.length === 1 && optionSets[optsArray[0]]) {
+            return optionSets[optsArray[0]]
+          } else {
+            return optsArray
+          }
+        }
+        return []
+      }
+    }
+  },
   methods: {
     parseConfig(text) {
       const lines = text.split('\n')
       let parameters = null
       lines.forEach((line) => {
         if (line.startsWith('# C[')) {
-          // Parse parameters from the comment
           parameters = this.parseParameters(line)
         } else if (line.includes('=')) {
           const [key, value] = line.split('=')
@@ -77,12 +95,18 @@ export default {
           if (!this.groupedConfig[groupName]) {
             this.groupedConfig[groupName] = {}
           }
+          // Check if the Opts parameter is a single value that matches an option set
+          if (parameters?.Opts && parameters.Opts.includes('|')) {
+            const optsArray = parameters.Opts.split('|')
+            if (optsArray.length === 1 && optionSets[optsArray[0]]) {
+              parameters.Opts = optionSets[optsArray[0]].join('|')
+            }
+          }
           // Store the value and parameters
           this.groupedConfig[groupName][key.trim()] = {
             value: value.trim().replace(/^"|"$/g, ''),
             parameters: parameters
           }
-          // Reset parameters for the next line
           parameters = null
         }
       })
