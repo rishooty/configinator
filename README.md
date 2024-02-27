@@ -15,3 +15,5 @@ Goal is to have this publicly hosted, as a PWA, and a self hosted version with i
 - [ ] Add PWA support
 - [ ] Host on AWS or Firebase, probably the latter.
 - [ ] Add node express api
+
+## Dynamic Textfile Parsing

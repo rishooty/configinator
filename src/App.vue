@@ -3,27 +3,34 @@
     <h1>Configuration Editor</h1>
     <div v-for="(group, groupName) in groupedConfig" :key="groupName">
       <h2>{{ groupName }}</h2>
-      <div v-for="(value, key) in group" :key="key">
-        <label>{{ key }}</label>
-        <!-- Use separate inputs for different types to avoid dynamic type binding issues -->
+      <div v-for="(item, key) in group" :key="key">
+        <label style="padding-right: 1vw">{{ key }}</label>
         <input
-          v-if="isBoolean(value)"
+          v-if="isBoolean(item.value)"
           type="checkbox"
-          :checked="value === 'true'"
+          :checked="item.value === 'true'"
           @change="updateBoolean(key, groupName, $event.target.checked)"
         />
         <input
-          v-else-if="isNumber(value)"
+          v-else-if="isNumber(item.value)"
           type="number"
-          :value="value"
+          :value="item.value"
+          :min="item?.parameters?.Min ?? 0"
           @input="updateValue(key, groupName, $event.target.value)"
         />
         <input
           v-else
           type="text"
-          :value="value"
+          :value="item.value"
           @input="updateValue(key, groupName, $event.target.value)"
         />
+        <!-- Display parameters if they exist -->
+        <!-- <div v-if="item.parameters">
+          <div v-for="(paramValue, paramKey) in item.parameters" :key="paramKey">
+            <label>{{ paramKey }}</label>
+            <input type="text" :value="paramValue" readonly />
+          </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -44,17 +51,40 @@ export default {
   methods: {
     parseConfig(text) {
       const lines = text.split('\n')
+      let parameters = null
       lines.forEach((line) => {
-        if (line.includes('=')) {
+        if (line.startsWith('# C[')) {
+          // Parse parameters from the comment
+          parameters = this.parseParameters(line)
+        } else if (line.includes('=')) {
           const [key, value] = line.split('=')
           const groupName = key.trim().split('_')[0]
           if (!this.groupedConfig[groupName]) {
             this.groupedConfig[groupName] = {}
           }
-          // Directly store the trimmed value
-          this.groupedConfig[groupName][key.trim()] = value.trim().replace(/^"|"$/g, '') // Remove quotes here for simplicity
+          // Store the value and parameters
+          // this.groupedConfig['video']['video_window_height_max'] = ...
+          this.groupedConfig[groupName][key.trim()] = {
+            value: value.trim().replace(/^"|"$/g, ''),
+            parameters: parameters
+          }
+          // Reset parameters for the next line
+          parameters = null
         }
       })
+    },
+    parseParameters(comment) {
+      // Extract parameters from the comment
+      const match = comment.match(/# C\[(.*?)\]R/)
+      if (match) {
+        const params = match[1].split(',').reduce((acc, param) => {
+          const [key, value] = param.split(':').map((s) => s.trim())
+          acc[key] = value
+          return acc
+        }, {})
+        return params
+      }
+      return null
     },
     isBoolean(value) {
       // Check without quotes
@@ -66,11 +96,11 @@ export default {
     },
     updateValue(key, groupName, newValue) {
       // Update the value directly
-      this.groupedConfig[groupName][key] = newValue
+      this.groupedConfig[groupName][key].value = newValue
     },
     updateBoolean(key, groupName, isChecked) {
       // Convert boolean to string representation
-      this.groupedConfig[groupName][key] = isChecked ? 'true' : 'false'
+      this.groupedConfig[groupName][key].value = isChecked ? 'true' : 'false'
     }
   }
 }
