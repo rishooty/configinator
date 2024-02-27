@@ -1,21 +1,23 @@
 <template>
   <div>
-    <h1>Configuration Editor</h1>
+    <h1>Configinator</h1>
     <div v-for="(group, groupName) in groupedConfig" :key="groupName">
       <h2>{{ groupName }}</h2>
       <div v-for="(item, key) in group" :key="key">
         <label style="padding-right: 1vw">{{ key }}</label>
-        <!-- Use separate inputs for different types to avoid dynamic type binding issues -->
         <input
           v-if="isBoolean(item.value)"
           type="checkbox"
-          :checked="item.value === 'true'"
+          :checked="item.value?.toLowerCase() === 'true'"
           @change="updateBoolean(key, groupName, $event.target.checked)"
         />
         <input
           v-else-if="isNumber(item.value)"
           type="number"
           :value="item.value"
+          :min="item?.parameters?.Min"
+          :max="item?.parameters?.Max"
+          :step="item?.parameters?.Step"
           @input="updateValue(key, groupName, $event.target.value)"
         />
         <select
@@ -100,7 +102,8 @@ export default {
     },
     isBoolean(value) {
       // Check without quotes
-      return value === 'true' || value === 'false'
+      const lowerCase = value?.toLowerCase()
+      return lowerCase === 'true' || lowerCase === 'false'
     },
     isNumber(value) {
       // Check if the value is a number

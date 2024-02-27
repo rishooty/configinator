@@ -17,3 +17,6 @@ Goal is to have this publicly hosted, as a PWA, and a self hosted version with i
 - [ ] Add node express api
 
 ## Dynamic Textfile Parsing
+It chekcs each line of a text file and splits them repeatedly until it has the information needed to render the front end. Some values are inferred by checking types. Others are explicitly stated from comments.
+
+These comments are parsed via regex. Parameters stated within are optional. Other preceeding comments are shown as tooltips. 
