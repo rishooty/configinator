@@ -5,6 +5,7 @@
       <h2>{{ groupName }}</h2>
       <div v-for="(item, key) in group" :key="key">
         <label style="padding-right: 1vw">{{ key }}</label>
+        <!-- Use separate inputs for different types to avoid dynamic type binding issues -->
         <input
           v-if="isBoolean(item.value)"
           type="checkbox"
@@ -15,9 +16,21 @@
           v-else-if="isNumber(item.value)"
           type="number"
           :value="item.value"
-          :min="item?.parameters?.Min ?? 0"
           @input="updateValue(key, groupName, $event.target.value)"
         />
+        <select
+          v-else-if="isOptType(item?.parameters?.Type)"
+          :value="item.value"
+          @input="updateValue(key, groupName, $event.target.value)"
+        >
+          <option
+            v-for="(option, index) in item?.parameters?.Opts?.split('|')"
+            :key="index"
+            :value="option"
+          >
+            {{ option }}
+          </option>
+        </select>
         <input
           v-else
           type="text"
@@ -25,12 +38,12 @@
           @input="updateValue(key, groupName, $event.target.value)"
         />
         <!-- Display parameters if they exist -->
-        <!-- <div v-if="item.parameters">
+        <div v-if="item.parameters">
           <div v-for="(paramValue, paramKey) in item.parameters" :key="paramKey">
             <label>{{ paramKey }}</label>
             <input type="text" :value="paramValue" readonly />
           </div>
-        </div> -->
+        </div>
       </div>
     </div>
   </div>
@@ -63,7 +76,6 @@ export default {
             this.groupedConfig[groupName] = {}
           }
           // Store the value and parameters
-          // this.groupedConfig['video']['video_window_height_max'] = ...
           this.groupedConfig[groupName][key.trim()] = {
             value: value.trim().replace(/^"|"$/g, ''),
             parameters: parameters
@@ -93,6 +105,10 @@ export default {
     isNumber(value) {
       // Check if the value is a number
       return !isNaN(parseFloat(value)) && isFinite(value)
+    },
+    isOptType(type) {
+      // Check if the type is 'Opt'
+      return type === 'Opt'
     },
     updateValue(key, groupName, newValue) {
       // Update the value directly
