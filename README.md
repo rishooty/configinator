@@ -12,11 +12,18 @@ Goal is to have this publicly hosted, as a PWA, and a self hosted version with i
 - [ ] Render each group as cascading lists.
 - [ ] Add support for mupen64plus.cfg - files with a mix of strings and non strings
 - [ ] Add support for zdoom.ini - .ini files where strings are not enclosed in quotes, support for tuples as three number input fields.
+- [ ] Add support for YAML recipe docs:
+    ```
+    # - <common name>:
+    #   name: Given Surname
+    #   job: JOB
+    #   skills:
+    #   - LANG
 - [ ] Add PWA support
 - [ ] Host on AWS or Firebase, probably the latter.
 - [ ] Add node express api
 
 ## Dynamic Textfile Parsing
-It chekcs each line of a text file and splits them repeatedly until it has the information needed to render the front end. Some values are inferred by checking types. Others are explicitly stated from comments.
+It checks each line of a text file and splits them repeatedly until it has the information needed to render the front end. Some values are inferred by checking types. Others are explicitly stated from comments.
 
-These comments are parsed via regex. Parameters stated within are optional. Other preceeding comments are shown as tooltips. 
+These comments are parsed via regex. Parameters stated within are optional. Other preceeding comment will be shown as tooltips. (WIP)
