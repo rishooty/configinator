@@ -6,6 +6,8 @@ Only tested on retroarch's own .cfg where everything is a string at the moment.
 
 Goal is to have this publicly hosted, as a PWA, and a self hosted version with its own node-express API to edit files directly on emulation handhelds or mini pcs.
 
+![alt text](public/image.png)
+
 ## TODO:
 - [ ] Have it parse special comments for more validation and input types; i.e. # C[Step: 10, Max: Height]R or C[Type: SDL Input]
 - [ ] Have parse nearby comments (excepting the above) as tooltips.
